@@ -55,7 +55,6 @@ class MainViewModel : ViewModel() {
                 name = catResponse.name,
                 temperament = catResponse.temperament,
                 origin = catResponse.origin,
-                countryCodes = catResponse.countryCodes,
                 description = catResponse.description,
                 referenceImageId = catResponse.referenceImageId,
                 color = BG_COLOR_LIST[index % BG_COLOR_LIST.size]

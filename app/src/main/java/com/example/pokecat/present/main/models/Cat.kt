@@ -6,7 +6,6 @@ data class Cat(
     val name: String,
     val temperament: String,
     val origin: String,
-    val countryCodes: String,
     val description: String,
     val referenceImageId: String? = null,
     val color: Long
