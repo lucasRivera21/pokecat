@@ -15,12 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.pokecat.R
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun MainScreen() {
+fun MainScreen(mainViewModel: MainViewModel = viewModel()) {
     Scaffold(floatingActionButton = {
         FloatingActionButton(onClick = { /*TODO*/ }) {
             Icon(
@@ -46,10 +46,4 @@ fun MainScreen() {
             Spacer(modifier = Modifier.height(48.dp))
         }
     }
-}
-
-@Preview(showSystemUi = true, name = "Light Mode")
-@Composable
-fun MainScreenPreview() {
-    MainScreen()
 }
