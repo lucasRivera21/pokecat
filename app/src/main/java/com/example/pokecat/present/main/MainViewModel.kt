@@ -7,16 +7,20 @@ import com.example.pokecat.api.models.CatResponse
 import com.example.pokecat.present.main.models.Cat
 import com.example.pokecat.present.main.models.Weight
 import com.example.pokecat.utils.Credentials.Companion.BG_COLOR_LIST
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 private const val TAG = "MainViewModel"
 
-class MainViewModel : ViewModel() {
-    private val repository = MainRepository()
-
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val repository: MainTask,
+    private val dispatchers: CoroutineDispatcher
+) : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
@@ -28,7 +32,7 @@ class MainViewModel : ViewModel() {
     }
 
     private fun fetchCat() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers) {
             _isLoading.value = true
             try {
                 val catListResponse = repository.fetchCats()
