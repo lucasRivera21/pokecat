@@ -18,5 +18,7 @@ class Credentials {
             0XFFF3722C,
             0XFFA155B9
         )
+
+        const val MAX_IMG_COMMUNITY = 10
     }
 }
