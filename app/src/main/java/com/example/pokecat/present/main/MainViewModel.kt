@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.pokecat.api.models.CatResponse
 import com.example.pokecat.present.main.models.Cat
 import com.example.pokecat.present.main.models.CatImgResponse
-import com.example.pokecat.present.main.models.Weight
 import com.example.pokecat.utils.Credentials.Companion.BG_COLOR_LIST
 import com.example.pokecat.utils.Credentials.Companion.MAX_IMG_COMMUNITY
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -51,7 +50,8 @@ class MainViewModel @Inject constructor(
                 if (catListResponse.isSuccessful) {
                     if (catListResponse.body() != null) {
                         Log.d(TAG, "fetch cat: ${catListResponse.body()!!}")
-                        _catList.value = catListResponseToCatList(catListResponse.body()!!)
+                        val catList = catListResponseToCatList(catListResponse.body()!!)
+                        insertCat(catList)
                         getAllCatImg()
                     }
                 } else {
@@ -60,7 +60,36 @@ class MainViewModel @Inject constructor(
             } catch (e: Exception) {
                 Log.e(TAG, "error fetch cat: ${e.message}")
             }
+            getAllCat()
             _isLoading.value = false
+        }
+    }
+
+    private suspend fun insertCat(catList: List<Cat>) {
+        try {
+            repository.insertCatList(catList)
+        } catch (e: Exception) {
+            Log.d(TAG, "error to insert in db")
+        }
+    }
+
+    private suspend fun getAllCat() {
+        try {
+            val catFromDb = repository.getAllCat()
+            _catList.value = catFromDb.map {
+                Cat(
+                    weight = it.weight,
+                    id = it.nameId,
+                    name = it.name,
+                    temperament = it.temperament,
+                    origin = it.origin,
+                    description = it.description,
+                    referenceImageId = it.imgName,
+                    color = it.color
+                )
+            }
+        } catch (e: Exception) {
+            Log.d(TAG, "error to get in db")
         }
     }
 
@@ -71,7 +100,7 @@ class MainViewModel @Inject constructor(
                 catImgIdList.add(catResponse.referenceImageId)
             }
             Cat(
-                weight = Weight(catResponse.weight.imperial, catResponse.weight.metric),
+                weight = catResponse.weight.metric,
                 id = catResponse.id,
                 name = catResponse.name,
                 temperament = catResponse.temperament,
@@ -129,7 +158,7 @@ class MainViewModel @Inject constructor(
             val fileName = "cat_img_${catImgResponse.id}.jpg"
             val file = File(directory, fileName)
 
-            if(catImgResponse.img != null){
+            if (catImgResponse.img != null) {
                 try {
                     file.outputStream().use { outputStream ->
                         catImgResponse.img.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
