@@ -8,15 +8,15 @@ class Credentials {
         const val API_KEY = BuildConfig.API_KEY
 
         val BG_COLOR_LIST = listOf(
-            0xFF43AA8B,
-            0xFFF94144,
-            0xFF2D9CDB,
-            0xFFF8961E,
-            0xFFF765A3,
-            0xFF7987FF,
-            0XFF90BE6D,
-            0XFFF3722C,
-            0XFFA155B9
+            "#43AA8B",
+            "#F94144",
+            "#2D9CDB",
+            "#F8961E",
+            "#F765A3",
+            "#7987FF",
+            "#90BE6D",
+            "#F3722C",
+            "#A155B9"
         )
 
         const val MAX_IMG_COMMUNITY = 10

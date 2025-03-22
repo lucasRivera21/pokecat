@@ -8,5 +8,5 @@ data class Cat(
     val origin: String,
     val description: String,
     val referenceImageId: String? = null,
-    val color: Long
+    val color: String
 )

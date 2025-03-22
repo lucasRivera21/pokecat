@@ -16,13 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.pokecat.present.main.models.Cat
+import com.example.pokecat.utils.Utilities.Companion.hexToColor
 
 @Composable
 fun CardCat(cat: Cat) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .background(color = Color(cat.color), shape = RoundedCornerShape(8.dp))
+            .background(color = Color(hexToColor(cat.color)), shape = RoundedCornerShape(8.dp))
             .padding(4.dp)
             .width(170.dp)
             .height(100.dp),

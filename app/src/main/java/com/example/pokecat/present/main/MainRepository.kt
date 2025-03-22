@@ -14,6 +14,7 @@ interface MainTask {
     suspend fun fetchCatImg(imgId: String): Response<Bitmap>
     suspend fun insertCatList(catListResponse: List<Cat>)
     suspend fun getAllCat(): List<CatEntity>
+    suspend fun updateCatImg(catImgId: String, imgName: String)
 }
 
 class MainRepository @Inject constructor(private val apiService: ApiService, private val db: AppDatabase) : MainTask {
@@ -44,5 +45,9 @@ class MainRepository @Inject constructor(private val apiService: ApiService, pri
 
     override suspend fun getAllCat(): List<CatEntity> {
         return db.catDao().getAllCat()
+    }
+
+    override suspend fun updateCatImg(catImgId: String, imgName: String) {
+        db.catDao().updateCatImg(catImgId, imgName)
     }
 }

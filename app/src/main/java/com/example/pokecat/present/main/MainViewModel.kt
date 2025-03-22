@@ -146,7 +146,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun saveImgList(catImgList: List<CatImgResponse>) {
+    private suspend fun saveImgList(catImgList: List<CatImgResponse>) {
         Log.d(TAG, "save img list: $catImgList")
 
         val directory = File(context.filesDir, "cat_img")
@@ -163,6 +163,8 @@ class MainViewModel @Inject constructor(
                     file.outputStream().use { outputStream ->
                         catImgResponse.img.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
                     }
+
+                    repository.updateCatImg(catImgResponse.id, fileName)
                 } catch (e: Exception) {
                     Log.e(TAG, "error save img list: ${e.message}")
                 }
