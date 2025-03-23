@@ -2,11 +2,13 @@ package com.example.pokecat.present.main
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pokecat.api.models.CatResponse
 import com.example.pokecat.present.main.models.Cat
+import com.example.pokecat.present.main.models.CatCard
 import com.example.pokecat.present.main.models.CatImgResponse
 import com.example.pokecat.utils.Credentials.Companion.BG_COLOR_LIST
 import com.example.pokecat.utils.Credentials.Companion.MAX_IMG_COMMUNITY
@@ -20,6 +22,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.FileOutputStream
 import javax.inject.Inject
 
 private const val TAG = "MainViewModel"
@@ -33,7 +36,7 @@ class MainViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
-    private val _catList = MutableStateFlow<List<Cat>>(emptyList())
+    private val _catList = MutableStateFlow<List<CatCard>>(emptyList())
     val catList = _catList.asStateFlow()
 
     private val catImgIdList = mutableListOf<String>()
@@ -45,20 +48,23 @@ class MainViewModel @Inject constructor(
     private fun fetchCat() {
         viewModelScope.launch(dispatchers) {
             _isLoading.value = true
-            try {
-                val catListResponse = repository.fetchCats()
-                if (catListResponse.isSuccessful) {
-                    if (catListResponse.body() != null) {
-                        Log.d(TAG, "fetch cat: ${catListResponse.body()!!}")
-                        val catList = catListResponseToCatList(catListResponse.body()!!)
-                        insertCat(catList)
-                        getAllCatImg()
+            val hasCatInDb = repository.getAllCat().isNotEmpty()
+
+            if (!hasCatInDb) {
+                try {
+                    val catListResponse = repository.fetchCats()
+                    if (catListResponse.isSuccessful) {
+                        if (catListResponse.body() != null) {
+                            val catList = catListResponseToCatList(catListResponse.body()!!)
+                            insertCat(catList)
+                            getAllCatImg()
+                        }
+                    } else {
+                        Log.e(TAG, "server error fetch cat: ${catListResponse.code()}")
                     }
-                } else {
-                    Log.e(TAG, "server error fetch cat: ${catListResponse.code()}")
+                } catch (e: Exception) {
+                    Log.e(TAG, "error fetch cat: ${e.message}")
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "error fetch cat: ${e.message}")
             }
             getAllCat()
             _isLoading.value = false
@@ -77,20 +83,30 @@ class MainViewModel @Inject constructor(
         try {
             val catFromDb = repository.getAllCat()
             _catList.value = catFromDb.map {
-                Cat(
-                    weight = it.weight,
-                    id = it.nameId,
+                val catImg = getCatImg(it.imgName)
+                CatCard(
+                    id = it.id,
                     name = it.name,
-                    temperament = it.temperament,
-                    origin = it.origin,
-                    description = it.description,
-                    referenceImageId = it.imgName,
-                    color = it.color
+                    color = it.color,
+                    imgBitmap = catImg
                 )
             }
         } catch (e: Exception) {
-            Log.d(TAG, "error to get in db")
+            Log.d(TAG, "error to get in db: $e")
         }
+    }
+
+    private fun getCatImg(imgName: String?): Bitmap? {
+        if (imgName == null) {
+            return null
+        }
+
+        val file = File(context.filesDir, imgName)
+        if(!file.exists()){
+            return null
+        }
+
+        return BitmapFactory.decodeFile(file.absolutePath)
     }
 
     private fun catListResponseToCatList(catListResponse: List<CatResponse>): List<Cat> {
@@ -113,7 +129,6 @@ class MainViewModel @Inject constructor(
     }
 
     private suspend fun getAllCatImg() {
-        Log.d(TAG, "cat img id list: $catImgIdList")
         coroutineScope {
             while (catImgIdList.isNotEmpty()) {
                 val firstsCatImgId = catImgIdList.take(MAX_IMG_COMMUNITY)
@@ -124,7 +139,8 @@ class MainViewModel @Inject constructor(
                             val response = repository.fetchCatImg(it)
                             if (response.isSuccessful) {
                                 if (response.body() != null) {
-                                    imgBitmap = response.body()!!
+                                    val inputStream = response.body()!!.byteStream()
+                                    imgBitmap = BitmapFactory.decodeStream(inputStream)
                                 }
                             } else {
                                 Log.e(TAG, "server error fetch cat img: ${response.code()}")
@@ -147,24 +163,21 @@ class MainViewModel @Inject constructor(
     }
 
     private suspend fun saveImgList(catImgList: List<CatImgResponse>) {
-        Log.d(TAG, "save img list: $catImgList")
-
-        val directory = File(context.filesDir, "cat_img")
-        if (!directory.exists()) {
-            directory.mkdirs()
-        }
-
         catImgList.forEach { catImgResponse ->
-            val fileName = "cat_img_${catImgResponse.id}.jpg"
-            val file = File(directory, fileName)
+            val fileName = "cat_img_${catImgResponse.id}.jpeg"
 
             if (catImgResponse.img != null) {
                 try {
-                    file.outputStream().use { outputStream ->
-                        catImgResponse.img.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-                    }
+                    val file = File(context.filesDir, fileName)
 
-                    repository.updateCatImg(catImgResponse.id, fileName)
+                    if(!file.exists()){
+                        val outputStream = FileOutputStream(file)
+                        catImgResponse.img.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                        outputStream.flush()
+                        outputStream.close()
+
+                        repository.updateCatImg(catImgResponse.id, fileName)
+                    }
                 } catch (e: Exception) {
                     Log.e(TAG, "error save img list: ${e.message}")
                 }

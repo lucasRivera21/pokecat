@@ -1,5 +1,7 @@
 package com.example.pokecat.present.main.models
 
+import android.graphics.Bitmap
+
 data class Cat(
     val weight: String,
     val id: String,
@@ -8,5 +10,6 @@ data class Cat(
     val origin: String,
     val description: String,
     val referenceImageId: String? = null,
-    val color: String
+    val color: String,
+    val imgBitmap: Bitmap? = null,
 )

@@ -14,5 +14,6 @@ data class CatEntity(
     val origin: String,
     val description: String,
     @SerializedName("img_name") val imgName: String? = null,
-    val color: String
+    val color: String,
+    val isFounded: Int = 0
 )
