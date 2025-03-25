@@ -23,20 +23,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.pokecat.R
+import com.example.pokecat.navigation.CameraScreen
 import com.example.pokecat.present.components.CardCat
 
 @Composable
-fun MainScreen(mainViewModel: MainViewModel = hiltViewModel()) {
+fun MainScreen(mainViewModel: MainViewModel = hiltViewModel(), navController: NavController) {
 
     val isLoading by mainViewModel.isLoading.collectAsState(false)
     val catList by mainViewModel.catList.collectAsState(listOf())
 
     Scaffold(floatingActionButton = {
-        FloatingActionButton(onClick = { /*TODO*/ }) {
+        FloatingActionButton(onClick = {
+            navController.navigate(CameraScreen.route)
+        }) {
             Icon(
                 painter = painterResource(R.drawable.ic_camera),
                 contentDescription = "Icon Camera",
@@ -77,10 +80,4 @@ fun MainScreen(mainViewModel: MainViewModel = hiltViewModel()) {
             }
         }
     }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-fun MainScreenPreview() {
-    MainScreen()
 }

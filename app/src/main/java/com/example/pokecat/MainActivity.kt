@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.example.pokecat.present.main.MainScreen
+import com.example.pokecat.navigation.AppNavigation
 import com.example.pokecat.ui.theme.PokecatTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             PokecatTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
-                    MainScreen()
+                    AppNavigation()
                 }
             }
         }
