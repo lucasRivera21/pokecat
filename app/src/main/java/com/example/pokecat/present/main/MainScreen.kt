@@ -1,5 +1,7 @@
 package com.example.pokecat.present.main
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,9 +38,17 @@ fun MainScreen(mainViewModel: MainViewModel = hiltViewModel(), navController: Na
     val isLoading by mainViewModel.isLoading.collectAsState(false)
     val catList by mainViewModel.catList.collectAsState(listOf())
 
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        if (it) {
+            navController.navigate(CameraScreen.route)
+        }
+    }
+
     Scaffold(floatingActionButton = {
         FloatingActionButton(onClick = {
-            navController.navigate(CameraScreen.route)
+            mainViewModel.checkPermission(permissionLauncher, navController)
         }) {
             Icon(
                 painter = painterResource(R.drawable.ic_camera),

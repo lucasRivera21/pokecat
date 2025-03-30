@@ -1,12 +1,18 @@
 package com.example.pokecat.present.main
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.example.pokecat.api.models.CatResponse
+import com.example.pokecat.navigation.CameraScreen
 import com.example.pokecat.present.main.models.Cat
 import com.example.pokecat.present.main.models.CatCard
 import com.example.pokecat.present.main.models.CatImgResponse
@@ -102,7 +108,7 @@ class MainViewModel @Inject constructor(
         }
 
         val file = File(context.filesDir, imgName)
-        if(!file.exists()){
+        if (!file.exists()) {
             return null
         }
 
@@ -170,7 +176,7 @@ class MainViewModel @Inject constructor(
                 try {
                     val file = File(context.filesDir, fileName)
 
-                    if(!file.exists()){
+                    if (!file.exists()) {
                         val outputStream = FileOutputStream(file)
                         catImgResponse.img.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
                         outputStream.flush()
@@ -182,6 +188,18 @@ class MainViewModel @Inject constructor(
                     Log.e(TAG, "error save img list: ${e.message}")
                 }
             }
+        }
+    }
+
+    fun checkPermission(
+        permissionLauncher: ManagedActivityResultLauncher<String, Boolean>,
+        navController: NavController
+    ) {
+        val permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            navController.navigate(CameraScreen.route)
+        } else {
+            permissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
 }
