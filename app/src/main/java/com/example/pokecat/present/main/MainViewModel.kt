@@ -5,14 +5,16 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.pokecat.api.models.CatResponse
-import com.example.pokecat.navigation.CameraScreen
+import com.example.pokecat.navigation.DetailsScreen
 import com.example.pokecat.present.main.models.Cat
 import com.example.pokecat.present.main.models.CatCard
 import com.example.pokecat.present.main.models.CatImgResponse
@@ -46,6 +48,7 @@ class MainViewModel @Inject constructor(
     val catList = _catList.asStateFlow()
 
     private val catImgIdList = mutableListOf<String>()
+    private var photoUri: Uri? = null
 
     init {
         fetchCat()
@@ -193,13 +196,24 @@ class MainViewModel @Inject constructor(
 
     fun checkPermission(
         permissionLauncher: ManagedActivityResultLauncher<String, Boolean>,
-        navController: NavController
+        cameraLauncher: ManagedActivityResultLauncher<Uri, Boolean>
     ) {
         val permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            navController.navigate(CameraScreen.route)
+            goToCamera(cameraLauncher)
         } else {
             permissionLauncher.launch(Manifest.permission.CAMERA)
         }
+    }
+
+    fun goToCamera(cameraLauncher: ManagedActivityResultLauncher<Uri, Boolean>) {
+        val cacheFile = File(context.cacheDir, "cache_photo.jpg")
+        photoUri =
+            FileProvider.getUriForFile(context, "${context.packageName}.provider", cacheFile)
+        cameraLauncher.launch(photoUri!!)
+    }
+
+    fun navigateScreen(navController: NavController) {
+        navController.navigate("${DetailsScreen.route}/${Uri.encode(photoUri.toString())}")
     }
 }

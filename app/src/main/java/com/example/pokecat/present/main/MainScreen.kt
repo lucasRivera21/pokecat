@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.pokecat.R
-import com.example.pokecat.navigation.CameraScreen
 import com.example.pokecat.present.components.CardCat
 
 @Composable
@@ -38,17 +37,23 @@ fun MainScreen(mainViewModel: MainViewModel = hiltViewModel(), navController: Na
     val isLoading by mainViewModel.isLoading.collectAsState(false)
     val catList by mainViewModel.catList.collectAsState(listOf())
 
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {success ->
+        if(success){
+            mainViewModel.navigateScreen(navController)
+        }
+    }
+
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) {
         if (it) {
-            navController.navigate(CameraScreen.route)
+            mainViewModel.goToCamera(cameraLauncher)
         }
     }
 
     Scaffold(floatingActionButton = {
         FloatingActionButton(onClick = {
-            mainViewModel.checkPermission(permissionLauncher, navController)
+            mainViewModel.checkPermission(permissionLauncher, cameraLauncher)
         }) {
             Icon(
                 painter = painterResource(R.drawable.ic_camera),

@@ -17,6 +17,9 @@ fun AppNavigation() {
 
         composable(CameraScreen.route) { CameraScreen() }
 
-        composable(DetailsScreen.route) { DetailsScreen() }
+        composable("${DetailsScreen.route}/{photo_uri}") {
+            val photoUri = it.arguments?.getString("photo_uri")
+            DetailsScreen(photoUri)
+        }
     }
 }
