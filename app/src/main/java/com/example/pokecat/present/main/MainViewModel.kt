@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -214,6 +215,11 @@ class MainViewModel @Inject constructor(
     }
 
     fun navigateScreen(navController: NavController) {
-        navController.navigate("${DetailsScreen.route}/${Uri.encode(photoUri.toString())}")
+        navController.navigate(DetailsScreen.route + "/-1/${Uri.encode(photoUri.toString())}")
+    }
+
+    fun onClickCard(navController: NavController, cardId: Int, founded: Boolean) {
+        if (!founded) Toast.makeText(context, "This cat is not founded", Toast.LENGTH_SHORT)
+            .show() else navController.navigate("${DetailsScreen.route}/$cardId/")
     }
 }

@@ -2,6 +2,7 @@ package com.example.pokecat.present.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,7 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.pokecat.R
 import com.example.pokecat.present.main.models.CatCard
@@ -29,7 +29,7 @@ import com.example.pokecat.utils.Credentials.Companion.BG_DONT_FOUND_CAT
 import com.example.pokecat.utils.Utilities.Companion.hexToColor
 
 @Composable
-fun CardCat(cat: CatCard) {
+fun CardCat(cat: CatCard, onClickCard: () -> Unit) {
     val cardColor =
         if (!cat.isFounded) Color(hexToColor(BG_DONT_FOUND_CAT)) else Color(hexToColor(cat.color))
 
@@ -39,7 +39,8 @@ fun CardCat(cat: CatCard) {
             .background(color = cardColor, shape = RoundedCornerShape(8.dp))
             .padding(4.dp)
             .width(170.dp)
-            .height(100.dp),
+            .height(100.dp)
+            .clickable { onClickCard() },
     ) {
         Text(text = cat.name, color = Color.White, style = MaterialTheme.typography.titleMedium)
 

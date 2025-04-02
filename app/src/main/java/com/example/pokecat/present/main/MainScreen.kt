@@ -89,7 +89,9 @@ fun MainScreen(mainViewModel: MainViewModel = hiltViewModel(), navController: Na
                     modifier = Modifier.padding(horizontal = 16.dp)
                 ) {
                     items(catList) { cat ->
-                        CardCat(cat = cat)
+                        CardCat(cat = cat){
+                            mainViewModel.onClickCard(navController, cat.id, cat.isFounded)
+                        }
                     }
                 }
             }
