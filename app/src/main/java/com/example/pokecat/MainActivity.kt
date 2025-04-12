@@ -18,8 +18,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PokecatTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
-                    AppNavigation()
+                Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
+                    AppNavigation(paddingValues)
                 }
             }
         }

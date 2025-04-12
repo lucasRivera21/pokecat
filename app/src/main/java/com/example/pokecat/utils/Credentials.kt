@@ -22,5 +22,7 @@ class Credentials {
         const val BG_DONT_FOUND_CAT = "#577590"
 
         const val MAX_IMG_COMMUNITY = 10
+
+        const val MAX_RECOGNITION_CAT_RESULTS = 5
     }
 }

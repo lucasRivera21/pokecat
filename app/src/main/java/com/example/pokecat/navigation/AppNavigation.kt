@@ -1,5 +1,6 @@
 package com.example.pokecat.navigation
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -11,7 +12,7 @@ import com.example.pokecat.present.details.DetailsScreen
 import com.example.pokecat.present.main.MainScreen
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(paddingValues: PaddingValues) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = MainScreen.route) {

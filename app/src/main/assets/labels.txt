@@ -1,0 +1,13 @@
+abyssinian
+bengal
+birman
+bombay
+british_shorthair
+egyptian_mau
+maine_coon
+persian
+ragdoll
+russian_blue
+siamese
+sphynx
+tuxedo
