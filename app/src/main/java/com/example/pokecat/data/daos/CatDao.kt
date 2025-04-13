@@ -16,4 +16,7 @@ interface CatDao {
 
     @Query("UPDATE cat SET imgName = :imgName WHERE imgName = :catImgId")
     suspend fun updateCatImg(catImgId: String, imgName: String)
+
+    @Query("SELECT * FROM cat WHERE id = :cardId")
+    suspend fun getCat(cardId: Int): CatEntity
 }

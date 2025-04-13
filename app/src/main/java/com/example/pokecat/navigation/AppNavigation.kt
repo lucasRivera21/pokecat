@@ -7,7 +7,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.pokecat.present.camera.CameraScreen
 import com.example.pokecat.present.details.DetailsScreen
 import com.example.pokecat.present.main.MainScreen
 
@@ -17,8 +16,6 @@ fun AppNavigation(paddingValues: PaddingValues) {
 
     NavHost(navController = navController, startDestination = MainScreen.route) {
         composable(MainScreen.route) { MainScreen(navController = navController) }
-
-        composable(CameraScreen.route) { CameraScreen() }
 
         composable("${DetailsScreen.route}/{card_id}/{photo_uri}", arguments = listOf(
             navArgument("card_id") {
@@ -33,7 +30,7 @@ fun AppNavigation(paddingValues: PaddingValues) {
         )) { entry ->
             val cardId = entry.arguments?.getInt("card_id")
             val photoUri = entry.arguments?.getString("photo_uri")
-            DetailsScreen(cardId, photoUri, navController)
+            DetailsScreen(cardId, photoUri, navController, paddingValues)
         }
     }
 }
