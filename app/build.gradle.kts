@@ -94,9 +94,6 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     //Tensorflow Lite
-    implementation(libs.tensorflow.lite)
-    implementation(libs.tensorflow.lite.gpu)
-    implementation(libs.tensorflow.lite.support)
     implementation(libs.litert.support.api)
     implementation(libs.litert)
 }

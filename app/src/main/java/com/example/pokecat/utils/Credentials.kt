@@ -24,5 +24,7 @@ class Credentials {
         const val MAX_IMG_COMMUNITY = 10
 
         const val MAX_RECOGNITION_CAT_RESULTS = 5
+
+        const val NAME_CACHE_FILE = "cache_photo.jpg"
     }
 }

@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.pokecat.machineLearning.Classifier
 import com.example.pokecat.present.details.models.DetailsToShow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -20,6 +21,7 @@ const val TAG = "DetailsViewModel"
 @HiltViewModel
 class DetailsViewModel @Inject constructor(
     private val repository: DetailsRepository,
+    private val classifier: Classifier,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
     private val _isLoading = MutableStateFlow(true)
@@ -56,6 +58,32 @@ class DetailsViewModel @Inject constructor(
 
             _isLoading.value = false
         }
+    }
+
+    fun identifyCat(photoName: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.value = true
+            var bitmap: Bitmap? = null
+
+            try{
+                bitmap = getImgFromUri(photoName)
+            }catch (e: Exception){
+                Log.d(TAG, "error to get img: $e")
+            }
+
+            if(bitmap != null){
+                val results = classifier.recognizeImage(bitmap)
+                Log.d(TAG, "results: $results")
+            }
+
+            _isLoading.value = false
+
+        }
+    }
+
+    private fun getImgFromUri(photoName: String): Bitmap {
+        val cacheFile = File(context.cacheDir, photoName)
+        return android.graphics.BitmapFactory.decodeFile(cacheFile.absolutePath)
     }
 
     private fun getImg(imgName: String): Bitmap {

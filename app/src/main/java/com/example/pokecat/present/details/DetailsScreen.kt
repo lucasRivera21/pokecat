@@ -64,10 +64,9 @@ fun DetailsScreen(
 
     LaunchedEffect(Unit) {
         if (cardId!! > 0) {
-            //Card Exist
             detailsViewModel.getCard(cardId)
         } else {
-            //New card
+            detailsViewModel.identifyCat(photoUri!!)
         }
     }
 

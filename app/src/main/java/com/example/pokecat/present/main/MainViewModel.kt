@@ -21,6 +21,7 @@ import com.example.pokecat.present.main.models.CatCard
 import com.example.pokecat.present.main.models.CatImgResponse
 import com.example.pokecat.utils.Credentials.Companion.BG_COLOR_LIST
 import com.example.pokecat.utils.Credentials.Companion.MAX_IMG_COMMUNITY
+import com.example.pokecat.utils.Credentials.Companion.NAME_CACHE_FILE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
@@ -208,14 +209,14 @@ class MainViewModel @Inject constructor(
     }
 
     fun goToCamera(cameraLauncher: ManagedActivityResultLauncher<Uri, Boolean>) {
-        val cacheFile = File(context.cacheDir, "cache_photo.jpg")
+        val cacheFile = File(context.cacheDir, NAME_CACHE_FILE)
         photoUri =
             FileProvider.getUriForFile(context, "${context.packageName}.provider", cacheFile)
         cameraLauncher.launch(photoUri!!)
     }
 
     fun navigateScreen(navController: NavController) {
-        navController.navigate(DetailsScreen.route + "/-1/${Uri.encode(photoUri.toString())}")
+        navController.navigate(DetailsScreen.route + "/-1/$NAME_CACHE_FILE")
     }
 
     fun onClickCard(navController: NavController, cardId: Int, founded: Boolean) {
