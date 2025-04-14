@@ -19,4 +19,8 @@ interface CatDao {
 
     @Query("SELECT * FROM cat WHERE id = :cardId")
     suspend fun getCat(cardId: Int): CatEntity
+
+    @Query("SELECT * FROM cat WHERE name = :catName")
+    suspend fun getCatByName(catName: String): CatEntity
+
 }

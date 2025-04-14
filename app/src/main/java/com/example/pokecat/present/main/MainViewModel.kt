@@ -22,6 +22,7 @@ import com.example.pokecat.present.main.models.CatImgResponse
 import com.example.pokecat.utils.Credentials.Companion.BG_COLOR_LIST
 import com.example.pokecat.utils.Credentials.Companion.MAX_IMG_COMMUNITY
 import com.example.pokecat.utils.Credentials.Companion.NAME_CACHE_FILE
+import com.example.pokecat.utils.Credentials.Companion.NAME_LIST_IN_MODEL
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
@@ -66,7 +67,9 @@ class MainViewModel @Inject constructor(
                     val catListResponse = repository.fetchCats()
                     if (catListResponse.isSuccessful) {
                         if (catListResponse.body() != null) {
-                            val catList = catListResponseToCatList(catListResponse.body()!!)
+                            val catListInModel = catListResponse.body()!!
+                                .filter { NAME_LIST_IN_MODEL.contains(it.name) }
+                            val catList = catListResponseToCatList(catListInModel)
                             insertCat(catList)
                             getAllCatImg()
                         }

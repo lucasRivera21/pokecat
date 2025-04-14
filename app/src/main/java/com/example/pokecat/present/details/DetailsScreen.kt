@@ -157,7 +157,7 @@ fun DetailContent(modifier: Modifier, cardId: Int?, catDetail: DetailsToShow?, s
             .fillMaxWidth()
             .fillMaxHeight(0.5f)
             .background(
-                colorBase.White,
+                MaterialTheme.colorScheme.background,
                 shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
             )
             .padding(top = 62.dp, start = 16.dp, end = 16.dp, bottom = 4.dp)

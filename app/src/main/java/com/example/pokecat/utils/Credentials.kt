@@ -26,5 +26,20 @@ class Credentials {
         const val MAX_RECOGNITION_CAT_RESULTS = 5
 
         const val NAME_CACHE_FILE = "cache_photo.jpg"
+
+        val NAME_LIST_IN_MODEL = listOf(
+            "Abyssinian",
+            "Bengal",
+            "Birman",
+            "Bombay",
+            "British Shorthair",
+            "Egyptian Mau",
+            "Maine Coon",
+            "Persian",
+            "Ragdoll",
+            "Russian Blue",
+            "Siamese",
+            "Sphynx"
+        )
     }
 }

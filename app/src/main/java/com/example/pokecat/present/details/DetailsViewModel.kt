@@ -40,7 +40,7 @@ class DetailsViewModel @Inject constructor(
             if (catCardEntity.imgName != null) {
                 try {
                     imgBitmap = getImg(catCardEntity.imgName)
-                }catch (e: Exception){
+                } catch (e: Exception) {
                     Log.d(TAG, "error to get img: $e")
                 }
 
@@ -60,24 +60,47 @@ class DetailsViewModel @Inject constructor(
         }
     }
 
-    fun identifyCat(photoName: String){
+    fun identifyCat(photoName: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.value = true
             var bitmap: Bitmap? = null
 
-            try{
+            try {
                 bitmap = getImgFromUri(photoName)
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 Log.d(TAG, "error to get img: $e")
             }
 
-            if(bitmap != null){
+            if (bitmap != null) {
                 val results = classifier.recognizeImage(bitmap)
                 Log.d(TAG, "results: $results")
+
+                if (results.isNotEmpty()) {
+                    val catIdentifier = results.first().id.split("_")
+                        .joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
+
+                    val catCardEntity = repository.getCardByName(catIdentifier)
+
+                    var imgBitmap: Bitmap? = null
+                    try {
+                        imgBitmap = getImg(catCardEntity.imgName!!)
+                    } catch (e: Exception) {
+                        Log.d(TAG, "error to get img: $e")
+                    }
+
+                    _catDetail.value = DetailsToShow(
+                        weight = catCardEntity.weight,
+                        name = catCardEntity.name,
+                        temperament = catCardEntity.temperament,
+                        origin = catCardEntity.origin,
+                        description = catCardEntity.description,
+                        img = imgBitmap,
+                        color = catCardEntity.color
+                    )
+                }
             }
 
             _isLoading.value = false
-
         }
     }
 
