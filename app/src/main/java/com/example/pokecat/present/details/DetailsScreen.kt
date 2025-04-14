@@ -114,9 +114,10 @@ fun DetailsScreen(
             DetailContent(
                 Modifier
                     .align(Alignment.BottomCenter),
-                cardId = cardId,
                 catDetail = catDetail,
-                scrollState = scrollState
+                scrollState = scrollState,
+                detailsViewModel = detailsViewModel,
+                navController = navController
             )
         } else {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -151,7 +152,13 @@ fun DetailHeader(navController: NavController, catDetail: DetailsToShow?) {
 }
 
 @Composable
-fun DetailContent(modifier: Modifier, cardId: Int?, catDetail: DetailsToShow?, scrollState: ScrollState) {
+fun DetailContent(
+    modifier: Modifier,
+    catDetail: DetailsToShow?,
+    scrollState: ScrollState,
+    detailsViewModel: DetailsViewModel,
+    navController: NavController
+) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -186,19 +193,22 @@ fun DetailContent(modifier: Modifier, cardId: Int?, catDetail: DetailsToShow?, s
             )
         }
 
-        if (cardId!! < 0) {
+        if (catDetail != null && !catDetail.isFounded) {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 CustomButton(
                     buttonText = "Register",
-                    colorButton = Color(hexToColor(catDetail?.color ?: BG_DONT_FOUND_CAT)),
-                    borderColor = Color(hexToColor(catDetail?.color ?: BG_DONT_FOUND_CAT)),
+                    colorButton = Color(hexToColor(catDetail.color)),
+                    borderColor = Color(hexToColor(catDetail.color)),
                     textColor = Color.White
-                ) { }
+                ) {
+                    detailsViewModel.registerCat()
+                    navController.popBackStack()
+                }
 
                 CustomButton(
                     buttonText = "Isn't this your cat?",
                     colorButton = Color.White,
-                    borderColor = Color(hexToColor(catDetail?.color ?: BG_DONT_FOUND_CAT)),
+                    borderColor = Color(hexToColor(catDetail.color)),
                     textColor = Color.Black
                 ) { }
             }

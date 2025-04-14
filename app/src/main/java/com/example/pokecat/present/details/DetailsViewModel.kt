@@ -47,13 +47,15 @@ class DetailsViewModel @Inject constructor(
             }
 
             _catDetail.value = DetailsToShow(
+                id = catCardEntity.id,
                 weight = catCardEntity.weight,
                 name = catCardEntity.name,
                 temperament = catCardEntity.temperament,
                 origin = catCardEntity.origin,
                 description = catCardEntity.description,
                 img = imgBitmap,
-                color = catCardEntity.color
+                color = catCardEntity.color,
+                isFounded = catCardEntity.isFounded > 0
             )
 
             _isLoading.value = false
@@ -89,18 +91,26 @@ class DetailsViewModel @Inject constructor(
                     }
 
                     _catDetail.value = DetailsToShow(
+                        id = catCardEntity.id,
                         weight = catCardEntity.weight,
                         name = catCardEntity.name,
                         temperament = catCardEntity.temperament,
                         origin = catCardEntity.origin,
                         description = catCardEntity.description,
                         img = imgBitmap,
-                        color = catCardEntity.color
+                        color = catCardEntity.color,
+                        isFounded = catCardEntity.isFounded > 0
                     )
                 }
             }
 
             _isLoading.value = false
+        }
+    }
+
+    fun registerCat(){
+        viewModelScope.launch(Dispatchers.IO){
+            repository.updateCatFounded(_catDetail.value!!.id)
         }
     }
 

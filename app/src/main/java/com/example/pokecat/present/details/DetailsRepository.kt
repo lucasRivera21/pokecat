@@ -12,4 +12,8 @@ class DetailsRepository @Inject constructor(private val db: AppDatabase) {
     suspend fun getCardByName(catName: String): CatEntity {
         return db.catDao().getCatByName(catName)
     }
+
+    suspend fun updateCatFounded(cardId: Int){
+        db.catDao().updateCatFounded(cardId)
+    }
 }

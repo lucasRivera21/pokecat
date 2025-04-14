@@ -53,11 +53,7 @@ class MainViewModel @Inject constructor(
     private val catImgIdList = mutableListOf<String>()
     private var photoUri: Uri? = null
 
-    init {
-        fetchCat()
-    }
-
-    private fun fetchCat() {
+    fun fetchCat() {
         viewModelScope.launch(dispatchers) {
             _isLoading.value = true
             val hasCatInDb = repository.getAllCat().isNotEmpty()
@@ -102,7 +98,8 @@ class MainViewModel @Inject constructor(
                     id = it.id,
                     name = it.name,
                     color = it.color,
-                    imgBitmap = catImg
+                    imgBitmap = catImg,
+                    isFounded = it.isFounded > 0
                 )
             }
         } catch (e: Exception) {
