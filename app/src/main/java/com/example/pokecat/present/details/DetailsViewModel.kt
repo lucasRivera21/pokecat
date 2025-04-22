@@ -30,6 +30,11 @@ class DetailsViewModel @Inject constructor(
     private val _catDetail = MutableStateFlow<DetailsToShow?>(null)
     val catDetail = _catDetail.asStateFlow()
 
+    private val _catRecognitionList = MutableStateFlow<List<String>>(emptyList())
+    val catRecognitionList = _catRecognitionList.asStateFlow()
+
+    private var allCatRecognitionList = mutableListOf<String>()
+
     fun getCard(catId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.value = true
@@ -78,29 +83,20 @@ class DetailsViewModel @Inject constructor(
                 Log.d(TAG, "results: $results")
 
                 if (results.isNotEmpty()) {
-                    val catIdentifier = results.first().id.split("_")
-                        .joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
+                    allCatRecognitionList.clear()
+                    allCatRecognitionList = results.map { catRecognition ->
+                        catRecognition.id.split("_")
+                            .joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
+                    }.toMutableList()
 
-                    val catCardEntity = repository.getCardByName(catIdentifier)
+                    val catIdentifier = allCatRecognitionList.first()
 
-                    var imgBitmap: Bitmap? = null
-                    try {
-                        imgBitmap = getImg(catCardEntity.imgName!!)
-                    } catch (e: Exception) {
-                        Log.d(TAG, "error to get img: $e")
-                    }
+                    val lastCatIdentifier =
+                        allCatRecognitionList.takeLastWhile { catIdentifier != it }
 
-                    _catDetail.value = DetailsToShow(
-                        id = catCardEntity.id,
-                        weight = catCardEntity.weight,
-                        name = catCardEntity.name,
-                        temperament = catCardEntity.temperament,
-                        origin = catCardEntity.origin,
-                        description = catCardEntity.description,
-                        img = imgBitmap,
-                        color = catCardEntity.color,
-                        isFounded = catCardEntity.isFounded > 0
-                    )
+                    _catRecognitionList.value = lastCatIdentifier
+
+                    _catDetail.value = getCardByName(catIdentifier)
                 }
             }
 
@@ -108,8 +104,42 @@ class DetailsViewModel @Inject constructor(
         }
     }
 
-    fun registerCat(){
-        viewModelScope.launch(Dispatchers.IO){
+    fun onClickOtherBreedCat(catBreed: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            _catDetail.value = getCardByName(catBreed)
+
+            val catSelected = _catDetail.value!!.name
+            val lastCatIdentifier = allCatRecognitionList.filter { catSelected != it }
+            _catRecognitionList.value = lastCatIdentifier
+        }
+    }
+
+    private suspend fun getCardByName(catName: String): DetailsToShow {
+        val catCardEntity = repository.getCardByName(catName)
+
+        var imgBitmap: Bitmap? = null
+        try {
+            imgBitmap = getImg(catCardEntity.imgName!!)
+        } catch (e: Exception) {
+            Log.d(TAG, "error to get img: $e")
+        }
+
+        _catDetail.value
+        return DetailsToShow(
+            id = catCardEntity.id,
+            weight = catCardEntity.weight,
+            name = catCardEntity.name,
+            temperament = catCardEntity.temperament,
+            origin = catCardEntity.origin,
+            description = catCardEntity.description,
+            img = imgBitmap,
+            color = catCardEntity.color,
+            isFounded = catCardEntity.isFounded > 0
+        )
+    }
+
+    fun registerCat() {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.updateCatFounded(_catDetail.value!!.id)
         }
     }

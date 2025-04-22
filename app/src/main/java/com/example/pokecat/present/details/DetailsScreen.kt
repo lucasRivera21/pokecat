@@ -22,14 +22,21 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,11 +51,14 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.pokecat.R
+import com.example.pokecat.present.components.ContentBottomSheet
 import com.example.pokecat.present.components.CustomButton
 import com.example.pokecat.present.details.models.DetailsToShow
 import com.example.pokecat.utils.Credentials.Companion.BG_DONT_FOUND_CAT
 import com.example.pokecat.utils.Utilities.Companion.hexToColor
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailsScreen(
     cardId: Int?,
@@ -58,9 +68,13 @@ fun DetailsScreen(
     detailsViewModel: DetailsViewModel = hiltViewModel()
 ) {
     val scrollState = rememberScrollState()
+    val sheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     val isLoading by detailsViewModel.isLoading.collectAsState()
     val catDetail by detailsViewModel.catDetail.collectAsState()
+    val catRecognitionList by detailsViewModel.catRecognitionList.collectAsState()
 
     LaunchedEffect(Unit) {
         if (cardId!! > 0) {
@@ -117,10 +131,33 @@ fun DetailsScreen(
                 catDetail = catDetail,
                 scrollState = scrollState,
                 detailsViewModel = detailsViewModel,
-                navController = navController
+                navController = navController,
+                showBottomSheet = {
+                    if (!sheetState.isVisible) {
+                        showBottomSheet = true
+                    }
+                }
             )
         } else {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
+
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showBottomSheet = false },
+                sheetState = sheetState
+            ) {
+                ContentBottomSheet(catRecognitionList) {
+                    detailsViewModel.onClickOtherBreedCat(it)
+                    scope.launch {
+                        sheetState.hide()
+                    }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            showBottomSheet = false
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -157,7 +194,8 @@ fun DetailContent(
     catDetail: DetailsToShow?,
     scrollState: ScrollState,
     detailsViewModel: DetailsViewModel,
-    navController: NavController
+    navController: NavController,
+    showBottomSheet: () -> Unit
 ) {
     Column(
         modifier = modifier
@@ -210,7 +248,9 @@ fun DetailContent(
                     colorButton = Color.White,
                     borderColor = Color(hexToColor(catDetail.color)),
                     textColor = Color.Black
-                ) { }
+                ) {
+                    showBottomSheet()
+                }
             }
         }
     }
